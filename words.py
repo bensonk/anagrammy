@@ -97,7 +97,7 @@ def process_line(line):
   elif cmd == "/":
     matcher(line, replace)
   else:
-    print """Help:
+    print """
   Commands:
     > [create]  Builds a word list based on supplied chars (e.g. > somecharstouse )  Follow with a number to limit results.
     + [add]     Builds new word list based on previous input with argument added (e.g. + foo)
@@ -107,6 +107,7 @@ def process_line(line):
     """
 
 if __name__ == "__main__":
+  process_line("") # Shows help.
   while True:
     try: process_line(raw_input(" ] "))
     except EOFError: break
