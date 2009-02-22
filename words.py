@@ -1,5 +1,10 @@
 #!/usr/bin/python
+import os, readline, atexit
 from pprint import pprint
+histfile = os.path.join(os.environ["HOME"], ".words-history")
+try: readline.read_history_file(histfile)
+except IOError: pass
+atexit.register(readline.write_history_file, histfile)
 
 class Wordstore(object):
   def __init__(self, file = None):
@@ -53,3 +58,4 @@ if __name__ == "__main__":
   while True:
     try: find(raw_input("> "))
     except: break
+print "" # To give the prompt back on its own line
