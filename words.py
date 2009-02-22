@@ -30,16 +30,14 @@ class Wordstore(object):
     return words
 
   def _lookup(self, letters, tree, string):
-    if len(letters) == 0: return []
     ret = []
-    for letter in letters:
-      if letter in tree:
-        new_letters = list(letters)
-        new_letters.remove(letter)
-        ret.extend(self._lookup(new_letters, tree[letter], string + letter))
-      else:
-        if "" in tree:
-          ret.append(string)
+    if "" in tree: ret.append(string)
+    if letters:
+      for letter in letters:
+        if letter in tree:
+          new_letters = list(letters)
+          new_letters.remove(letter)
+          ret.extend(self._lookup(new_letters, tree[letter], string + letter))
     return ret
 
 print "Reading dictionary..."
@@ -53,4 +51,5 @@ def find(letters, count = 00):
 print "Done reading dictionary"
 if __name__ == "__main__":
   while True:
-    find(raw_input("> "))
+    try: find(raw_input("> "))
+    except: break
