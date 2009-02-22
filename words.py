@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import os, readline, atexit
+import os, readline, atexit, re
 from pprint import pprint
 histfile = os.path.join(os.environ["HOME"], ".words-history")
 try: readline.read_history_file(histfile)
@@ -47,15 +47,67 @@ class Wordstore(object):
 
 print "Reading dictionary..."
 words = Wordstore("/usr/share/dict/words")
-def find(letters, count = 00):
+print "Done reading dictionary"
+
+def print_words(words):
+    for word in words:
+        print word
+
+lastwords = []
+lastfind = ""
+def find(letters, replace=False, count = 0):
   res = words.lookup(letters)
   if len(res) > count:
     res = res[-count:]
-  for word in res:
-    print word
-print "Done reading dictionary"
+  print_words(res)
+  if replace:
+    global lastwords, lastfind
+    lastwords = res
+    lastfind = letters
+
+def matcher(line, replace=False):
+  global lastwords
+  regex = re.compile(line)
+  res = filter(lambda x: regex.findall(x), lastwords)
+  if replace:
+      lastwords = res
+  print_words(res)
+
+def process_line(line):
+  if line.startswith("!"):
+    line = line[1:]
+    replace = True
+  else:
+    replace = False
+  if not lastwords:
+    replace = True
+
+  if len(line) > 1:
+    cmd, line = line[0], line[1:].strip()
+  else:
+    cmd = ""
+
+  if " " in line: line, count = line.rsplit(" ", 1)
+  else:           count = 0
+
+  if cmd == ">":
+    find(line.strip(), True, int(count))
+  elif cmd == "+":
+    find(line.strip() + lastfind, replace, int(count))
+  elif cmd == "/":
+    matcher(line, replace)
+  else:
+    print """Help:
+  Commands:
+    > [create]  Builds a word list based on supplied chars (e.g. > somecharstouse )  Follow with a number to limit results.
+    + [add]     Builds new word list based on previous input with argument added (e.g. + foo)
+    / [search]  Shows words that match regex (e.g. / ef$)
+  Modifiers:
+    ! [replace] Prepend to add or search to replace word list with result of command (e.g. !/ ^..s....$)
+    """
+
 if __name__ == "__main__":
   while True:
-    try: find(raw_input("> "))
-    except: break
+    try: process_line(raw_input(" ] "))
+    except EOFError: break
 print "" # To give the prompt back on its own line
