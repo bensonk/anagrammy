@@ -1,10 +1,14 @@
 #!/usr/bin/python
-import os, readline, atexit, re
+import os, re, readline, atexit, yaml
 from pprint import pprint
 histfile = os.path.join(os.environ["HOME"], ".words-history")
 try: readline.read_history_file(histfile)
 except IOError: pass
 atexit.register(readline.write_history_file, histfile)
+
+val = yaml.load(open("alphabetsoup.yml"))
+def score(word):
+  return reduce(lambda a,b:a+b, [ val[x] for x in word ])
 
 class Wordstore(object):
   def __init__(self, file = None):
@@ -31,7 +35,7 @@ class Wordstore(object):
 
   def lookup(self, letters):
     words = list(set(self._lookup(list(letters), self.tree, "")))
-    words.sort(key = lambda x: len(x))
+    words.sort(key = lambda x: score(x))
     return words
 
   def _lookup(self, letters, tree, string):
