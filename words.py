@@ -43,10 +43,14 @@ class Wordstore(object):
     if "" in tree: ret.append(string)
     if letters:
       for letter in letters:
-        if letter in tree:
+        if letter == "*" or letter in tree:
           new_letters = list(letters)
           new_letters.remove(letter)
-          ret.extend(self._lookup(new_letters, tree[letter], string + letter))
+          if letter == "*":
+            for l in tree:
+              ret.extend(self._lookup(new_letters, tree[l], string + l))
+          else:
+            ret.extend(self._lookup(new_letters, tree[letter], string + letter))
     return ret
 
 print "Reading dictionary..."
