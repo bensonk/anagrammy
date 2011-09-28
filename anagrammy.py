@@ -31,7 +31,8 @@ class Wordstore(object):
   def load(self, filename):
     self.tree = dict()
     for word in open(filename).xreadlines():
-      self.add_word(word)
+      if word.strip() != '' and "'" not in word:
+        self.add_word(word)
 
   def lookup(self, letters):
     words = list(set(self._lookup(list(letters), self.tree, "")))
